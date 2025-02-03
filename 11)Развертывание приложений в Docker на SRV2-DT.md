@@ -30,7 +30,7 @@
 ```json
 {
   "storage-driver": "overlay2",
-  "insecure-registries" : ["192.168.33.67:5000", "srv2-dt.au.team"]
+  "insecure-registries": ["192.168.33.67:5000", "srv2-dt.au.team"]
 }
 ```
 
