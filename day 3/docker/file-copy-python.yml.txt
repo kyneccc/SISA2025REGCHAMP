@@ -1,0 +1,4 @@
+FROM python:3.8-alpine
+COPY ./py.py /root/py.py
+COPY ./input.python /root/input.txt
+CMD python3 /root/py.py

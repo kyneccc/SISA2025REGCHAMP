@@ -1,0 +1,50 @@
+ services:
+
+   elasticsearch:
+     image: elasticsearch:7.10.1
+     ports:
+       - '9200:9200'
+     environment:
+       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+       discovery.type: single-node
+       xpack.license.self_generated.type: basic
+       xpack.security.enabled: true
+       ELASTIC_PASSWORD: P@ssw0rd
+     ulimits:
+       memlock:
+         soft: -1
+         hard: -1
+     restart: always
+
+   kibana:
+     image: kibana:7.10.1
+     ports:
+       - '5601:5601'
+     environment:
+       SERVERNAME: kibana
+       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+       ELASTICSEARCH_USERNAME: elastic
+       ELASTICSEARCH_PASSWORD: P@ssw0rd
+     depends_on:
+       - elasticsearch
+     restart: always
+
+   logstash:
+     image: logstash:7.10.1
+     ports:
+       - '8092:8091'
+     environment:
+       XPACK_MONITORING_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+       XPACK_MONITORING_ENABLED: "true"
+       XPACK_MONITORING_ELASTICSEARCH_USERNAME: elastic
+       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: P@ssw0rd
+     volumes:
+       - type: bind
+         source: ./logstash_pipeline/
+         target: /usr/share/logstash/pipeline
+         read_only: true
+     depends_on:
+       - elasticsearch
+     restart: always
+
+

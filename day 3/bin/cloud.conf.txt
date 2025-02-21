@@ -1,0 +1,6 @@
+export OS_AUTH_URL=https://172.20.0.52:5000/
+export OS_PROJECT_NAME="Test1_project"
+export OS_PROJECT_DOMAIN_NAME="Test1"
+export OS_USER_DOMAIN_NAME="Test1"
+export OS_USERNAME="Test_user1"
+export OS_PASSWORD=P@ssw0rd

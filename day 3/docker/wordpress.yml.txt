@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:5.7
+    hostname: wp_database
+    container_name: wp_database
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      TZ: "Europe/Moscow"
+      MYSQL_ROOT_PASSWORD: sjbs[kdjgbsd'jgb
+      MYSQL_DATABASE: MYSQL
+      MYSQL_USER: USER
+      MYSQL_PASSWORD: P@ssw0rd
+    networks:
+      -  wordpress-network
+
+  wordpress:
+    depends_on:
+      - mysql
+    image: wordpress:latest
+    hostname: wp_app
+    container_name: wp_app
+    volumes:
+      - wordpress_data:/var/www/html
+    ports:
+      - "8000:80"
+    restart: always
+    user: www-data
+    environment:
+      TZ: "Europe/Moscow"
+      WORDPRESS_DB_HOST: wp_database
+      WORDPRESS_DB_USER: USER
+      WORDPRESS_DB_PASSWORD: P@ssw0rd
+      WORDPRESS_DB_NAME: MYSQL
+    networks:
+      -  wordpress-network
+
+
+volumes:
+  db_data: {}
+  wordpress_data: {}
+
+networks:
+  wordpress-network:

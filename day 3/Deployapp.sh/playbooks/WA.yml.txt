@@ -1,0 +1,22 @@
+- name: webadmin
+  hosts: webadm
+  become: true
+  tasks:
+    - name: install wg
+      yum:
+        name: "{{ item }}"
+        state: installed
+        update_cache: yes
+      loop:
+        - wireguard-tools
+        - wireguard-tools-wg-quick
+    - name: copy cfg
+      copy:
+        src: /home/altlinux/wg/webadm.conf
+        dest: /etc/wireguard/
+    - name: start wg
+      service:
+        name: wg-quick@webadm
+        state: restarted
+        enabled: true
+~

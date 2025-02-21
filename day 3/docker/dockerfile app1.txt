@@ -1,0 +1,5 @@
+FROM python:3-slim
+WORKDIR /app1
+COPY ./app1.py /app1/
+EXPOSE 80
+CMD pip3 install flask requests  && python3 app1.py
