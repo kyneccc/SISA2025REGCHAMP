@@ -1,0 +1,80 @@
+---
+- name: configure web-servers
+  hosts:
+    - web
+  become: true
+  tasks:
+    - name: install docker
+      yum:
+        name: "{{ item }}"
+        state: installed
+        update_cache: yes
+      loop:
+        - docker-engine
+        - wireguard-tools
+        - wireguard-tools-wg-quick
+        - nginx
+    - name: copy daemon.json
+      copy:
+        src: ./docker/daemon.json
+        dest: /etc/docker/daemon.json
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+    - name: run app 1
+      shell: docker run --name app1 --network host --restart always -p 80:80 -d 172.20.102.54:5000/app1
+      ignore_errors: yes
+    - name: vpn ssh
+      blockinfile:
+        path: /etc/openssh/sshd_config
+        block: |
+          Match Address 10.5.2.0/24
+          PasswordAuthentication yes
+    - name: restart ssh
+      service:
+        name: sshd
+        state: restarted
+        enabled: yes
+    - name: chg passwd
+      shell: chpasswd <<<"altlinux:P@ssw0rd"
+      ignore_errors: true
+    - name: nginx dir
+      file:
+        path: /etc/nginx/cert
+        state: directory
+    - name: nginx copy cfg
+      copy:
+        src: ./default.conf
+        dest: /etc/nginx/sites-enabled.d/  - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+        enabled: yes
+    - name: copy wg.conf
+      copy:
+        src: /home/altlinux/wg/web1.conf
+        dest: /etc/wireguard/web.conf
+      when: vars_when == 1
+    - name: copy wg.conf
+      copy:
+        src: /home/altlinux/wg/web2.conf
+        dest: /etc/wireguard/web.conf
+      when: vars_when == 2
+    - name: start wg
+      service:
+        name: wg-quick@web
+        state: restarted
+        enabled: yes
+    - name: activate connection wg
+      shell: ping 10.11.11.1 -c 4
+      ignore_errors: yes
+
+    - name: copy cert
+      copy:
+        src: "{{ item }}"
+        dest: /etc/nginx/cert/
+      loop:
+        - /home/altlinux/rootCA.crt
+        - /home/altlinux/rootCA.key
