@@ -38,7 +38,7 @@
         state: restarted
         enabled: yes
     - name: chg passwd
-      shell: chpasswd <<<"altlinux:P@ssw0rd"
+      shell: chpasswd <<<"altlinux:P@ssw0rd1"
       ignore_errors: true
     - name: nginx dir
       file:
