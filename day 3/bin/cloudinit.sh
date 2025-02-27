@@ -1,5 +1,5 @@
 #!/bin/bash
-source /home/altlinux/bin/cloud.conf
+source /home/altlinux/bin/cloudstart.conf
 
 openstack keypair create --public-key /home/altlinux/.ssh/id_rsa.pub ControlVM --insecure
 openstack network create local --insecure
@@ -46,10 +46,10 @@ openstack floating ip create --port loadbalancerpub public  --insecure
 FIPLB=$(openstack floating ip list --insecure | grep 192.168.10.240 | awk '{print$4}')
 #заполнение файла white ip
 
-echo WebADM $FIPWEBADM > /home/altlinux/white.ip
-echo WEB1 $FIPWEB1 >>/home/altlinux/white.ip
-echo WEB2 $FIPWEB2 >> /home/altlinux/white.ip
-echo Loadbalancer $FIPLB >> /home/altlinux/white.ip
+echo WebADM $FIPWEBADM > /home/altlinux/white-address.ip
+echo WEB1 $FIPWEB1 >>/home/altlinux/white-address.ip
+echo WEB2 $FIPWEB2 >> /home/altlinux/white-address.ip
+echo Loadbalancer $FIPLB >> /home/altlinux/white-address.ip
 
 
 echo '[web]' > /etc/ansible/hosts
