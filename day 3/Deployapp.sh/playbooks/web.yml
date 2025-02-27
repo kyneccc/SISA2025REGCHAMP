@@ -24,7 +24,7 @@
         state: restarted
         enabled: yes
     - name: run app 1
-      shell: docker run --name app1 --network host --restart always -p 80:80 -d 172.20.102.54:5000/app1
+      shell: docker run --name app1 --network host --restart always -p 80:80 -d <ControlvmIp>:5000/app1
       ignore_errors: yes
     - name: vpn ssh
       blockinfile:
