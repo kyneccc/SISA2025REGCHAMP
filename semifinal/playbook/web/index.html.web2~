@@ -1,0 +1,28 @@
+<?php
+// Вывод имени веб-сервера, который обработал запрос
+echo "Веб-сервер: " . gethostname() . "<br>";
+
+// Параметры подключения к базе данных PostgreSQL
+$host = '192.168.10.5'; // Или Cloud-DB02 для резервного подключения
+$port = '5432';
+$dbname = 'testdb';
+$user = 'testuser';
+$password = 'testpassword';
+
+// Попытка подключения к базе данных
+try {
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;user=$user;password=$password";
+    $conn = new PDO($dsn);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Запрос для получения имени сервера базы данных
+    $query = "SELECT inet_server_addr() AS db_host, inet_server_port() AS db_port";
+    $stmt = $conn->query($query);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    echo "Подключение к базе данных успешно!<br>";
+    echo "Сервер базы данных: " . $result['db_host'];
+} catch (PDOException $e) {
+    echo "Ошибка подключения к базе данных: " . $e->getMessage();
+}
+?>

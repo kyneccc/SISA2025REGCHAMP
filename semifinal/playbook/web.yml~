@@ -1,0 +1,80 @@
+---
+- name: Настройка веб-серверов Cloud-WEB01 и Cloud-WEB02
+  hosts: web01
+  become: yes
+
+  tasks:
+    - name: install apache 
+      yum:
+        name:
+          - apache2
+          - apache2-mod_ssl
+          - php8.2
+          - openssl
+          - apache2-mod_php8.2
+          - php8.2-pgsql
+          - php8.2-pdo
+          - php8.2-pdo_pgsql
+        state: installed
+        update_cache: yes
+    - name: create dir 
+      file:
+        path: /var/www/html
+        state: directory
+    - name: create for cert
+      file:
+        path: /etc/ssl/certs/
+        state: directory
+    - name: create for certkey
+      file:
+        path: /etc/ssl/private/
+        state: directory
+    - name: copy php app web1
+      copy:
+        src: web/index.html.web1
+        dest: /var/www/html/index.php
+    - name: copy php app web2
+      copy:
+        src: web/index.html.web2
+        dest: /var/www/html/index.php
+      when: inventory_hostname=='web01'
+    - name: copy cert 
+      copy: 
+        src: web/certificate.crt
+        dest: /etc/ssl/certs/selfsigned.crt 
+    - name: copy cert key
+      copy: 
+        src: web/private_key.pem
+        dest: /etc/ssl/private/selfsigned.key
+    - name: create HTTP cfg
+      template:
+        src: web/http.cfg
+        dest: /etc/httpd2/conf/sites-enabled/http.conf
+      when: inventory_hostname=='web02'
+    - name: create  HTTPS cfg
+      template:
+        src: web/https.cfg
+        dest: /etc/httpd2/conf/sites-available/https.conf
+    - name: on ssl in apache
+      command: a2enmod ssl 
+    - name: Удаление файла
+      file:
+        path: /etc/httpd2/conf/sites-available/000-default.conf
+        state: absent
+    - name: Удаление файла
+      file:
+        path: /var/www/html/index.html
+        state: absent
+    - name: mk file
+      file: 
+        path: /etc/httpd2/conf/ports-enabled/https.conf
+        state: touch
+    - name: https 
+      lineinfile:
+        path: /etc/httpd2/conf/ports-enabled/https.conf
+        line: Listen 443
+
+    - name: Restart Apache
+      service:
+        name: httpd2
+        state: restarted
